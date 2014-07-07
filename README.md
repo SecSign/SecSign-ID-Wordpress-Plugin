@@ -10,7 +10,7 @@ SecSign ID - The mobile way to log into web sites
 * This service is free for users and website owners and free of advertising - no matter how many users you have.
 * You can also integrate the SecSign ID as inhouse solution into your existing infrastructure (on request with licensed service and maintenance contract)
 
-<youtube http://www.youtube.com/watch?v=DNjrbEuMB7Y>
+<http://www.youtube.com/watch?v=DNjrbEuMB7Y>
 
 ## SecSign ID features:
 
@@ -28,7 +28,7 @@ SecSign ID - The mobile way to log into web sites
 * High availability through redundant remote failover servers
 * Multi-tier high security architecture with multiple firewalls and protocol filters.
 
-SecSign ID in action:
+**SecSign ID in action:**
 
 1. Get the app for iPhone <https://itunes.apple.com/app/secsign/id581467871> or Android <https://play.google.com/store/apps/details?id=com.secsign.secsignid>
 2. Choose a unique user short name
@@ -36,7 +36,7 @@ SecSign ID in action:
 
 That's it! You can now use your SecSign ID to sign in.
 
-How to sign in:
+**How to sign in:**
 
 Just type in your user short name (for instance at SecSign Portal <https://portal.secsign.com> or your Wordpress site using this plugin), confirm your sign-in on your phone and you are done within seconds.
 
@@ -82,7 +82,7 @@ and check out our flyer at <https://www.secsign.com/secsign_portal_flyer.pdf>.
 
 * When new users sign in with their SecSign ID on your WordPress site, you can allow them to create a new WordPress user or assign an existing one themselves. This saves you from adding them manually and assigning a SecSign ID to their account.
 
-<youtube http://www.youtube.com/watch?v=utphj_m6jd4>
+<http://www.youtube.com/watch?v=utphj_m6jd4>
 
 ## Frequently Asked Questions
 
