@@ -3,6 +3,9 @@ SecSign-ID-Wordpress-Plugin
 
 Use the SecSign ID two-factor authentication on your Wordpress site to enable easy and secure login using your iPhone or Android phone.
 
+<http://wordpress.org/plugins/secsign/>
+
+
 SecSign ID - The mobile way to log into web sites
 
 * Integrate SecSign ID into your own Wordpress site in less than one minute. (There are also APIs for PHP and Java.)
@@ -55,6 +58,8 @@ and check out our flyer at <https://www.secsign.com/secsign_portal_flyer.pdf>.
 * Login into Wordpress as admin and go to the plugins screen and select the "Add New" submenu.
 * Search for "SecSign" and click "Install Now" or click on "Upload" and select the downloaded zip archive.
 * Activate the plugin in the "Installed Plugins" list.
+
+* Or you visit the plugin site <http://wordpress.org/plugins/secsign/>
 
 **Add the Login Widget**
 
