@@ -8,6 +8,9 @@ Use the SecSign ID two-factor authentication on your Wordpress site to enable ea
 
 SecSign ID - The mobile way to log into web sites
 
+SecSign ID is a plugin for real two-factor authentication (2FA) for Wordpress sites. 2FA adds another layer of security to your website by using a second token. In this case the physical token is your smartphone. 
+If you seek for more information about about two-factor authentication have a look at <https://www.secsign.com/two-factor-authentication/>.
+
 * Integrate SecSign ID into your own Wordpress site in less than one minute. (There are also APIs for PHP and Java.)
 * You and your users can also use SecSign ID to visit securely other web sites (e.g. <https://portal.secsign.com> for true professional messaging and cloud sharing.)
 * This service is free for users and website owners and free of advertising - no matter how many users you have.
@@ -30,6 +33,9 @@ SecSign ID - The mobile way to log into web sites
 * Private keys are never transmitted to authentication server
 * High availability through redundant remote failover servers
 * Multi-tier high security architecture with multiple firewalls and protocol filters.
+
+More information at at <https://www.secsign.com/security-id/>.
+
 
 **SecSign ID in action:**
 
