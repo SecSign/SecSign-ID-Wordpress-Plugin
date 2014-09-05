@@ -1,6 +1,6 @@
 <?php
 
-// $Id: secsignid_login_admin.php,v 1.4 2014/06/11 15:31:39 jwollner Exp $
+// $Id: secsignid_login_admin.php,v 1.5 2014/07/07 14:43:32 jwollner Exp $
 
     // for all hooks, see http://adambrown.info/p/wp_hooks
     
@@ -69,7 +69,7 @@
                                                           'name'    => 'secsignid_user_mapping', 
                                                           'default' => '', 
                                                           'label'   => 'Assigned SecSign IDs to Wordpress Users',
-                                                          'desc'	=> __('Your users can also assign a SecSign ID in their profile themselves.', $secsignid_login_text_domain),
+                                                          'desc'	=> __('Your users can also assign a SecSign ID themselves in their profile.', $secsignid_login_text_domain),
                                                           'type'    => 'database_table_users',
                                                           'get_subscribers'	=> true
                                                           )
@@ -78,7 +78,7 @@
                                         // next section
                                         array(
                                               __('Fast Registration', $secsignid_login_text_domain), 
-                                              'When new users sign in with their SecSign ID on your WordPress site, you can allow them to create a new wordpress user or assign an existing one. This saves you from adding them manually and assigning a SecSign ID to their account.',//label
+                                              'In order not to have to create new user accounts yourself you can allow your co-workers or web site users to create user accounts themselves by logging in with their SecSign ID via <a href="'.wp_login_url().'">wp-login.php</a> or the login widget. You can allow them to create a new wordpress user or assign an existing one. After they created an wordpress account, you can assign wordpress roles to your co-workers via the user administration.',//label
                                               array(
                                                     array(
                                                           'name'    => 'secsignid_allow_account_creation', 
