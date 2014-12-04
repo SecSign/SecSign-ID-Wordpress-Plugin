@@ -51,7 +51,7 @@ Just type in your user short name (for instance at SecSign Portal <https://porta
 
 Despite its simplicity SecSign ID works with comprehensive strongest security technologies. The solution we offer is unique and does not submit any confidential data through a web browser.
 
-We have a strong background of more than 14 years in developing strong cryptography and highly sophisticated security software products for governments, public institutions and private companies.
+We have a strong background of more than 16 years in developing strong cryptography and highly sophisticated security software products for governments, public institutions and private companies.
 
 Visit our official site to get the app and more information: <https://www.secsign.com>
 
