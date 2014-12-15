@@ -65,6 +65,13 @@ and check out our flyer at <https://www.secsign.com/secsign_portal_flyer.pdf>.
 * Search for "SecSign" and click "Install Now" or click on "Upload" and select the downloaded zip archive.
 * Activate the plugin in the "Installed Plugins" list.
 
+**Note**
+
+The SecSign ID WordPress plugin uses the SecSign ID API <https://github.com/SecSign/secsign-php-api>. 
+The API requests from the ID server a so-called access pass (a session and a pass icon) which must be confirmed on the smartphone. 
+In order to enable the plugin to establish a connection to the ID server, the curl packet <http://php.net/manual/de/book.curl.php> must be installed for PHP, 
+and the web server on which the WordPress site is running must be able to reach the ID server under https://httpapi.secsign.com. Otherwise, you have to make changes in the settings for firewall and/or proxy.
+
 * Or you visit the plugin site <http://wordpress.org/plugins/secsign/>
 
 **Add the Login Widget**
