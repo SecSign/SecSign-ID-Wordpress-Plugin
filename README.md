@@ -1,4 +1,4 @@
-SecSign-ID-Wordpress-Plugin
+SecSign ID Wordpress Plugin
 ===========================
 
 Use the SecSign ID two-factor authentication on your Wordpress site to enable easy and secure login using your iPhone or Android phone.
