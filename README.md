@@ -19,7 +19,7 @@ If you seek for more information about about two-factor authentication have a lo
 <http://www.youtube.com/watch?v=DNjrbEuMB7Y>
 
 There are also APIs for PHP, Ruby, Perl, Python and Java as well as plugins and modules for Joomla and Drupal.
-A complete overview about available plugins and APIs could be found at <https://www.secsign.com/plugins/>.
+A complete overview about available plugins and APIs can be found at <https://www.secsign.com/plugins/>.
 
 ## SecSign ID features:
 
