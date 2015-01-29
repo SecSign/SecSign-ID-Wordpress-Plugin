@@ -113,7 +113,10 @@ You can just sign in with your SecSign ID. You will then be shown a dialog, wher
 
 Alternatively, you can go to your profile page to assign a SecSign ID.
 
-**Tutorial**
+## Information and Tutorial:
 
-See <https://www.secsign.com/wordpress-tutorial/>
+More information is available at the Wordpress SecSign ID tutorial website at <https://www.secsign.com/wordpress-tutorial/>.
+
+For more detailed information about two-factor-authentication (2FA) or two-step-authentication please have a look at the SecSign blog entry <https://www.secsign.com/two-factor-authentication-vs-two-step-verification/>.
+
 
