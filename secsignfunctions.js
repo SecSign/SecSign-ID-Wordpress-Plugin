@@ -1,4 +1,4 @@
-// $Id: secsignfunctions.js,v 1.6 2015/04/22 12:26:52 titus Exp $
+// $Id: secsignfunctions.js,v 1.7 2015/04/28 09:49:45 titus Exp $
  
 /*!
  * This script contains general helper functions.
@@ -43,14 +43,18 @@ jQuery('#secsignidplugin').find('#user_pass').on('input', function() {
 
 //responsive layout
 window.onload = function () {
-    var width = document.getElementById("secsignidplugin").offsetWidth;
-    responsive(width);
+    var secsignidplugin = document.getElementById("secsignidplugin");
+    if(secsignidplugin != null){
+        responsive(secsignidplugin.offsetWidth);
+    }
     frameOption(frameoption, backend);
 };
 
 window.addEventListener('resize', function () {
-    var width = document.getElementById("secsignidplugin").offsetWidth;
-    responsive(width);
+    var secsignidplugin = document.getElementById("secsignidplugin");
+    if(secsignidplugin != null){
+        responsive(secsignidplugin.offsetWidth);
+    }
 });
 
 function responsive(width) {
@@ -131,7 +135,7 @@ var docCookies = {
 };
 
 //Load SecSignID API
-jQuery.getScript(secsignPluginPath + "SecSignIDApi.js", function () {
+jQuery.getScript(secsignPluginPath + "jsApi/SecSignIDApi.js", function () {
 
     //Polling
     var timeTillAjaxSessionStateCheck = 3700;
