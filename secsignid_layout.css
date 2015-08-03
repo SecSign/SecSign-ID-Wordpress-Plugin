@@ -183,7 +183,9 @@ Blue: #599fcb
 }
 
 #secsignidplugin .linktext {
-    float: right;
+	display:block;
+	margin-left:10px;
+    float: left;
     color: #bdc3c7;
     text-decoration: none;
     line-height: 25px;
@@ -261,11 +263,12 @@ Blue: #599fcb
 }
 
 #secsignidplugin .accesspass-id{
-    display: inline-block;
-    float: right;
+    display: block;
+    position:relative;
+    float: left;
     line-height: 25px;
     padding: 0;
-    margin: 0;
+    margin: 0px 0px 0px 10px;
 }
 
 #secsignidplugin ol{
@@ -275,9 +278,14 @@ Blue: #599fcb
 /* BUTTONS */
 
 #secsignidplugin .infobutton{
-    text-indent: -9999px;
+    /*text-indent: -9999px;*/
+    text-indent: 100%;
+	white-space: nowrap;
+	overflow: hidden;
+
     height: 25px;
     width: 24px;
+    float:left;
     display: inline-block;
     -webkit-transition-property: none;
     transition-property: none;
@@ -358,7 +366,7 @@ Blue: #599fcb
     display: block;
     float: none;
     text-align: center;
-    margin: 20px 0;
+    margin: 20px 0 20px 10px;
 }
 
 #secsignid-accesspass-container.miniview{
