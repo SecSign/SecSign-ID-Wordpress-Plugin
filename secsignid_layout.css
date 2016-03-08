@@ -27,6 +27,7 @@ Blue: #599fcb
     font-family: Lato, Helvetica, Arial, sans-serif;
     font-size: 15px;
     display: block;
+    box-sizing: content-box;
 }
 
 #secsignidplugin p, #secsignidplugin li {
@@ -256,6 +257,7 @@ Blue: #599fcb
     box-shadow: none;
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
+    box-sizing: content-box;
 }
 
 #secsignidplugin #secsignid-accesspass-info{

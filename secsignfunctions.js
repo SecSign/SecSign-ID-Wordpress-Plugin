@@ -81,10 +81,19 @@ function frameOption(frame, backend){
 }
 
 //helper for clearing all input fields
-function clearSecsignForm() {
+function clearSecSignForm() {
+    // reset old values in hidden fields
+    jQuery("#secsignid-accesspass-form > input[name='secsigniduserid']").val("");
+    jQuery("#secsignid-accesspass-form > input[name='secsignidrequestid']").val("");
+    jQuery("#secsignid-accesspass-form > input[name='secsignidauthsessionid']").val("");
+    
+    // reset access path back to preload animated gif
     jQuery("#secsignid-accesspass-img").attr('src', secsignPluginPath+'images/preload.gif');
+    
+    // reset all visible input fields
     jQuery("#secsignidplugin").find("input[type='text']").val("");
     jQuery("#secsignid-error").html("").css('display', 'none');
+    
     //get Rememberme Cookie
     secsignid = docCookies.getItem('secsignRememberMe');
     if (secsignid) {
@@ -138,10 +147,12 @@ var docCookies = {
 jQuery.getScript(secsignPluginPath + "jsApi/SecSignIDApi.js", function () {
 
     //Polling
-    var timeTillAjaxSessionStateCheck = 3700;
+    var timeUntilAuthSessionCheck = 3700;
     var checkSessionStateTimerId = -1;
+    var cancelPressedBeforeAuthSessionRetrieved = false;
 
-    function ajaxCheckForSessionState() {
+    function checkSecSignIdAuthSessionState()
+    {
         var secSignIDApi = new SecSignIDApi({posturl: apiurl});
         secSignIDApi.getAuthSessionState(
             jQuery("input[name='secsigniduserid']").val(),
@@ -153,15 +164,12 @@ jQuery.getScript(secsignPluginPath + "jsApi/SecSignIDApi.js", function () {
                     if ("errormsg" in responseMap) {
                         //enable buttons
                         jQuery("#secloginbtn").prop("disabled", false);
-                        //clear interval
-                        window.clearInterval(checkSessionStateTimerId);
                         return;
                     } else if (!("authsessionstate" in responseMap)) {
                         return;
                     }
                     if (responseMap["authsessionstate"] == undefined || responseMap["authsessionstate"].length < 1) {
                         // got answer without an auth session state. this is not parsable and will throw the error UNKNOWN
-                        window.clearInterval(checkSessionStateTimerId);
                         return;
                     }
 
@@ -177,15 +185,24 @@ jQuery.getScript(secsignPluginPath + "jsApi/SecSignIDApi.js", function () {
                     var SESSION_STATE_FETCHED = 7;
                     var SESSION_STATE_INVALID = 8;
 
-                    //3 Login, 24568 show error, 017 do nothing
+                    // 3 Login, 24568 show error, 017 do nothing
                     if (authSessionStatus == SESSION_STATE_AUTHENTICATED) {
+                        //
                         //Log In
-                        window.clearInterval(checkSessionStateTimerId);
+                        //
                         jQuery("#secsignid-accesspass-form").submit();
-                    } else if ((authSessionStatus == SESSION_STATE_DENIED) || (authSessionStatus == SESSION_STATE_EXPIRED)
-                         || (authSessionStatus == SESSION_STATE_SUSPENDED) || (authSessionStatus == SESSION_STATE_INVALID) || (authSessionStatus == SESSION_STATE_CANCELED)) {
+                        
+                    } else if(authSessionStatus == SESSION_STATE_PENDING || authSessionStatus == SESSION_STATE_FETCHED){
+                    	//
+                    	// user did not authenticate nor denied the session. so we need to check again the authentication session state
+                    	//
+                    	checkSessionStateTimerId = window.setTimeout(checkSecSignIdAuthSessionState, timeUntilAuthSessionCheck);
+                        
+                    } else if ((authSessionStatus == SESSION_STATE_DENIED) || (authSessionStatus == SESSION_STATE_EXPIRED) ||
+                         	   (authSessionStatus == SESSION_STATE_SUSPENDED) || (authSessionStatus == SESSION_STATE_INVALID) || 
+                         	   (authSessionStatus == SESSION_STATE_CANCELED)) {
+                        
                         //Show Error
-                        window.clearInterval(checkSessionStateTimerId);
                         jQuery("#secsignid-page-accesspass").fadeOut(
                             function () {
                                 var secsignid = jQuery("input[name='secsigniduserid']").val();
@@ -211,13 +228,13 @@ jQuery.getScript(secsignPluginPath + "jsApi/SecSignIDApi.js", function () {
                                     errormsg = responseMap["message"];
                                 }
 
-                                clearSecsignForm();
+                                clearSecSignForm();
                                 jQuery("#secsignid-page-login").fadeIn();
                                 jQuery("#secloginbtn").prop("disabled", false);
                                 jQuery("#secsignid-error").html(errormsg).fadeIn();
-                                var secSignIDApi = new SecSignIDApi({posturl: apiurl});
-                                secSignIDApi.cancelAuthSession(secsignid, requestId, authsessionId, function rMap(responseMap) {
-                                });
+
+								// actually no need to cancel an already invalid session
+                                // new SecSignIDApi({posturl: apiurl}).cancelAuthSession(secsignid, requestId, authsessionId);
                             }
                         );
                     }
@@ -230,10 +247,9 @@ jQuery.getScript(secsignPluginPath + "jsApi/SecSignIDApi.js", function () {
     for (var timerId = 1; timerId < 5000; timerId++) {
         clearTimeout(timerId);
     }
-
     jQuery(document).ready(function (event) {
 
-        clearSecsignForm();
+        clearSecSignForm();
 
         /* Button & page logic*/
         jQuery("#secsignid-pw").click(function (event) {
@@ -300,13 +316,22 @@ jQuery.getScript(secsignPluginPath + "jsApi/SecSignIDApi.js", function () {
                     var secsignid = jQuery("input[name='secsigniduserid']").val();
                     var requestId = jQuery("input[name = 'secsignidrequestid']").val();
                     var authsessionId = jQuery("input[name = 'secsignidauthsessionid']").val();
-
-                    clearSecsignForm();
+					
+                    clearSecSignForm();
                     jQuery("#secsignid-page-login").fadeIn();
                     jQuery("#secloginbtn").prop("disabled", false);
-
-                    var secSignIDApi = new SecSignIDApi({posturl: apiurl});
-                    secSignIDApi.cancelAuthSession(secsignid, requestId, authsessionId, function rMap(responseMap) {
+                    
+                    if(!requestId){
+						cancelPressedBeforeAuthSessionRetrieved = true;
+						
+						// we cannot cancel a session because we dont have any request id.
+						// this will be handled in callback function of requestAuthSession where 'cancelPressedBeforeAuthSessionRetrieved' is checked.
+						return;
+					}
+					
+                    new SecSignIDApi({posturl: apiurl}).cancelAuthSession(secsignid, requestId, authsessionId, function rMap(responseMap) {
+                    	// clear timeout
+                        window.clearTimeout(checkSessionStateTimerId);
                     });
                 }
             );
@@ -317,13 +342,15 @@ jQuery.getScript(secsignPluginPath + "jsApi/SecSignIDApi.js", function () {
 
                 //disable button to prevent frozen state
                 jQuery("#secloginbtn").prop("disabled", true);
-
+				
+				
                 var requestid = '';
                 if (requestid == '') {
                     //load Accesspass with preloader
                     event.preventDefault();
-                    secsignid = jQuery("input[name='secsigniduserid']").val();
-
+                    var secsignid = jQuery("input[name='secsigniduserid']").val();
+					cancelPressedBeforeAuthSessionRetrieved = false;
+					
                     if (secsignid == "") {
                         //back to login screen
                         jQuery("#secsignid-page-accesspass").fadeOut(
@@ -341,7 +368,11 @@ jQuery.getScript(secsignPluginPath + "jsApi/SecSignIDApi.js", function () {
                         } else {
                             docCookies.removeItem('secsignRememberMe');
                         }
-
+						
+						// first off all, reset access pass page
+						jQuery("#secsignid-accesspass-img").attr('src', secsignPluginPath+'images/preload.gif');
+						
+						// fade out login and show access pass page
                         jQuery("#secsignid-page-login").fadeOut(
                             function () {
                                 jQuery("#secsignid-page-accesspass").fadeIn();
@@ -350,10 +381,7 @@ jQuery.getScript(secsignPluginPath + "jsApi/SecSignIDApi.js", function () {
                         );
 
                         //request auth session
-                        var secsignid = jQuery("input[name='secsigniduserid']").val();
-                        var secSignIDApi = new SecSignIDApi({posturl: apiurl, pluginname: "wordpress"});
-                        // alert(JSON.stringify(secSignIDApi));
-                        	
+                        var secSignIDApi = new SecSignIDApi({posturl: apiurl, pluginname: "wordpress"}); // to debug class object: alert(JSON.stringify(secSignIDApi));
                         secSignIDApi.requestAuthSession(secsignid, title, url, '', function rMap(responseMap) {
                             if ("errormsg" in responseMap) {
                                 //back to login screen
@@ -362,13 +390,23 @@ jQuery.getScript(secsignPluginPath + "jsApi/SecSignIDApi.js", function () {
                                         jQuery("#secsignid-page-login").fadeIn();
                                         //enable buttons
                                         jQuery("#secloginbtn").prop("disabled", false);
-                                        //clear interval
-                                        window.clearInterval(checkSessionStateTimerId);
                                     }
                                 );
                                 jQuery("#secsignid-error").html(responseMap["errormsg"]).fadeIn();
                             } else {
                                 if ("authsessionicondata" in responseMap && responseMap["authsessionicondata"] != '') {
+                                	// check whether cancel was pressed to fast?
+                                	if(cancelPressedBeforeAuthSessionRetrieved){
+                                		// cancel this session straight away
+                                		// other possibility could be: switch back to access path view...
+                                		new SecSignIDApi({posturl: apiurl}).cancelAuthSession(responseMap["secsignid"], responseMap["requestid"], responseMap["authsessionid"]);
+                    					cancelPressedBeforeAuthSessionRetrieved = false;
+                    					return;
+                    				}
+									
+									// no error so far.
+									// and the user did not cancel the session to fast
+									
                                     //fill hidden form
                                     jQuery("input[name='secsigniduserid']").val(responseMap["secsignid"]);
                                     jQuery("input[name='secsignidauthsessionid']").val(responseMap["authsessionid"]);
@@ -383,11 +421,8 @@ jQuery.getScript(secsignPluginPath + "jsApi/SecSignIDApi.js", function () {
                                         }
                                     );
 
-                                    //activate polling
-                                    checkSessionStateTimerId = window.setInterval(function () {
-                                        ajaxCheckForSessionState();
-                                    }, timeTillAjaxSessionStateCheck);
-
+                                    // activate polling.
+                                    checkSessionStateTimerId = window.setTimeout(checkSecSignIdAuthSessionState, timeUntilAuthSessionCheck);
 
                                 } else {
                                     //back to login screen
