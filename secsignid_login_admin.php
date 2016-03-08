@@ -319,8 +319,8 @@ if (!(function_exists('secsignid_login_options_page'))) {
                                 alert("SecSign ID for wordpress user '" + span.innerHTML + "' has to many characters.");
                                 return false;
                             }
-                            var chk = /^[\w@_\-\.]*$/.test(value);
-                            if (!chk) {
+                            
+                            if (!SecSignIdApi.checkSecSignId(value)) {
                                 alert("SecSign ID for wordpress user '" + span.innerHTML + "' contains illegal characters.");
                                 return false;
                             }

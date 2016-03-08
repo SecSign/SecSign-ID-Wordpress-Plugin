@@ -2,8 +2,8 @@
 /*
 Plugin Name: SecSign
 Plugin URI: https://www.secsign.com/add-it-to-your-website/
-Version: 1.7.6
-Description: The plugin allows a user to login using a SecSign ID and his smartphone.
+Version: 1.7.7
+Description: Two-factor authentication (2FA) with the SecSign ID. The SecSign plugin allows a user to login using his SecSign ID and his smartphone.
 Author: SecSign Technologies Inc.
 Author URI: http://www.secsign.com
 */
@@ -101,7 +101,7 @@ if (!(function_exists('secsign_print_parameters'))) {
         $wp_site_url = get_site_url();
         echo '<script>
             //Parameters
-            var url = "";
+            var url = "' . $wp_site_url . '";
             var siteurl = "' . $wp_site_url . '";
             var title = "' . addslashes(get_option('secsignid_service_name')) . '";
             var secsignPluginPath = "' .addslashes($plugin_path) . '";
@@ -112,13 +112,14 @@ if (!(function_exists('secsign_print_parameters'))) {
             var secsignid = "";
             var frameoption = "' . addslashes(get_option('secsignid_frame')) . '";
 
-            if (url == "") {
-                url = "' . $wp_site_url . '";
+            if(!url) {
+                url = location.href;
             }
-            if (title == "") {
+            if(!title) {
                 title = document.title;
             }
-            if (typeof backend == "undefined") {
+            
+            if(typeof backend == "undefined") {
                 var backend = false;
             }
         </script>
@@ -135,8 +136,18 @@ if (!(function_exists('secsign_custom_login_form'))) {
     {
         if (get_option('secsignid_show_on_login_page')) {
             echo <<<SECSIGNJS
-				<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 				<script type="text/javascript">
+					if(! window.jQuery){
+						var jQueryScriptTag = document.createElement('script'); 
+						jQueryScriptTag.type = 'text/javascript';
+						jQueryScriptTag.src = 'https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js';
+						
+						document.getElementsByTagName('head')[0].appendChild(jQueryScriptTag);
+					}
+					
+					// if jquery is not loaded it will be forced to load from google.
+					// this will block the further processing, so we can continue normally
+					
 					jQuery(document).ready(function(){
 
 						// switch order of normal login fields and the secsign id block
@@ -244,25 +255,7 @@ if (!(function_exists('secsign_id_init'))) {
 
         // create widget class and hook widget initialization
         // @see http://codex.wordpress.org/Widgets_API
-        class SecSignIDLogin_Widget extends WP_Widget
-        {
-            // constructor
-            function SecSignIDLogin_Widget()
-            {
-                global $secsignid_login_text_domain;
-                $widget_ops = array('description' => __('SecSign ID Login.', $secsignid_login_text_domain));
-                $this->WP_Widget('wp_secsignidlogin', __('SecSign ID Login', $secsignid_login_text_domain), $widget_ops);
-            }
-
-            // this method is called whenever the widget shall be drawn
-            // redirect to method which decides whether the user is logged in or not
-            function widget($args, $instance)
-            {
-                secsign_id_login($args);
-            }
-        }
-
-        register_widget('SecSignIDLogin_Widget');
+        //moved to 1351 class SecSignIDLogin_Widget extends WP_Widget
     }
 }
 
@@ -1024,7 +1017,7 @@ if (!(function_exists('print_login_form'))) {
                 <form id="secsignid-loginform">
                     <div class="form-group">
                         <input type="text" class="form-control login-field" value="" placeholder="SecSign ID"
-                               id="login-secsignid" name="secsigniduserid">
+                               id="login-secsignid" name="secsigniduserid"  autocapitalize="off" autocorrect="off">
                         <label class="login-field-icon fui-user" for="login-secsignid"></label>
                     </div>
 
@@ -1238,12 +1231,12 @@ if (!(function_exists('print_wpuser_mapping_form'))) {
         if (get_option('secsignid_allow_account_assignment')) {
             echo '<form action="' . $form_post_url . '" method="post" id="login-form">
                     <div class="form-group">
-                        <input id="wp-username" name="wp-username" type="text" size="15" maxlength="30" class="form-control login-field" placeholder="Username">
-                        <!--id="login-user" type="text" name="username" class="form-control login-field" tabindex="0" size="18" placeholder="Username">-->
+                        <input id="wp-username" name="wp-username" type="text" size="15" maxlength="30" class="form-control login-field" placeholder="Username" autocapitalize="off" autocorrect="off">
+                        <!--id="login-user" type="text" name="username" class="form-control login-field" tabindex="0" size="18" placeholder="Username" autocapitalize="off" autocorrect="off">-->
                     </div>
                     <div class="form-group">
-                        <!--<input  id="login-user" type="password" name="username" class="form-control login-field" tabindex="0" size="18" placeholder="Password">-->
-                        <input id="wp-password" name="wp-password" type="password" size="15" maxlength="30" class="form-control login-field" placeholder="Password">
+                        <!--<input  id="login-user" type="password" name="username" class="form-control login-field" tabindex="0" size="18" placeholder="Password" autocapitalize="off" autocorrect="off">-->
+                        <input id="wp-password" name="wp-password" type="password" size="15" maxlength="30" class="form-control login-field" placeholder="Password" autocapitalize="off" autocorrect="off">
                     </div>
                     <button type="submit" tabindex="0" name="existingaccount" value="1" id="pwdloginbtn">Assign to existing account</button>
                     <input type="hidden" name="secsignid" value="' . $secsignid . '" />
@@ -1364,4 +1357,31 @@ if (!(function_exists('get_plugin_version'))) {
         return $plugin_data["Version"];
     }
 }
+
+
+class SecSignIDLogin_Widget extends WP_Widget
+{
+
+    // constructor
+    function __construct() {
+        global $secsignid_login_text_domain;
+        $widget_ops = array('description' => __('SecSign ID Login.', $secsignid_login_text_domain));
+        parent::__construct('wp_secsignidlogin', __('SecSign ID Login', $secsignid_login_text_domain), $widget_ops);
+    }
+
+    // this method is called whenever the widget shall be drawn
+    // redirect to method which decides whether the user is logged in or not
+    function widget($args, $instance)
+    {
+        secsign_id_login($args);
+    }
+
+}
+// register SecSignIDLogin_Widget widget
+function register_secsignidlogin_widget() {
+    register_widget('SecSignIDLogin_Widget');
+}
+add_action('widgets_init', 'register_secsignidlogin_widget');
+
+
 ?>
