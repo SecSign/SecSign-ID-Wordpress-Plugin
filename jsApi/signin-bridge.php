@@ -3,7 +3,7 @@
 //
 // SecSign ID Api php bridge to redirect requests sent by javascript.
 //
-// (c) 2014 SecSign Technologies Inc.
+// (c) 2014-2016 SecSign Technologies Inc.
 //
 
 	include ('phpApi/SecSignIDApi.php');

@@ -18,7 +18,7 @@ function SecSignIDApi(options)
 		posturl : "/",
 		referer : 'SecSignIDApi_JS',
 		pluginname : 'SecSignIDApi_JS',
-		version : "1.29"
+		version : "1.30"
 	};
 	
 	_merge(this, merge(defaultsettings, options, true));
@@ -48,6 +48,17 @@ SecSignIDApi.prototype.requestAuthSession = function(secsignid, servicename, ser
 	
 	// ensure that the secsign id is lower case
 	secsignid = secsignid.toLowerCase().trim();
+	
+	// ensure that service name is not to long...
+	if(servicename.length > 255){
+		servicename = servicename.substr(0, 255);
+	}
+	
+	// ensure that service address is not to long...
+	// e.g. http://localhost/secsign/newjoomlaupdates/administrator/index.php?option=com_config&view=component&component=com_secsignid&path=&return=aHR0cDovL2xvY2FsaG9zdC9zZWNzaWduL25ld2pvb21sYXVwZGF0ZXMvYWRtaW5pc3RyYXRvci9pbmRleC5waHA%2Fb3B0aW9uPWNvbV9zZWNzaWduaWQ%3D
+	if(serviceaddress.length > 255){
+		serviceaddress = serviceaddress.substr(0, 255);
+	}
 
 	// check again. probably just spacess which will ne empty after trim()
 	if(!secsignid){
@@ -215,6 +226,21 @@ SecSignIDApi.prototype.createResponseMap = function(response){
 	return map;
 };
 
+
+//
+// several check methods
+//
+
+/**
+ * Checks whether a secsign id meets some requirements
+ */
+SecSignIDApi.checkSecSignId = function(secSignIdString){
+	// illegal characters are e.g. #+*?!%$&(){}[]:
+	// allowed besides letter characters and numbers are only @ _ - .
+	var secSignIdCheckResult = /^[\w@_\-\.]*$/.test(secSignIdString);
+	
+	return secSignIdCheckResult;
+};
 
 /**
  * Javascript class to encapsulate an object with data about an authentication session
