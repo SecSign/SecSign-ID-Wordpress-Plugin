@@ -18,7 +18,7 @@ function SecSignIDApi(options)
 		posturl : "/",
 		referer : 'SecSignIDApi_JS',
 		pluginname : 'SecSignIDApi_JS',
-		version : "1.30"
+		version : "1.31"
 	};
 	
 	_merge(this, merge(defaultsettings, options, true));
