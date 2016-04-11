@@ -2,7 +2,7 @@
 /*
 Plugin Name: SecSign
 Plugin URI: https://www.secsign.com/add-it-to-your-website/
-Version: 1.7.7
+Version: 1.7.9
 Description: Two-factor authentication (2FA) with the SecSign ID. The SecSign plugin allows a user to login using his SecSign ID and his smartphone.
 Author: SecSign Technologies Inc.
 Author URI: http://www.secsign.com
