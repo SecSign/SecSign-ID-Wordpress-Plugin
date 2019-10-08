@@ -4,19 +4,28 @@
 
 add_action('admin_init', 'secsignid_login_options_init');
 add_action('admin_menu', 'secsignid_login_options_add_page');
-
 add_action('delete_user', 'delete_user_secsignid_mapping'); // is called when a user is deleted
-
 add_action('show_user_profile', 'add_secsignid_login_fields'); // is called if logged in user opens his own profile...
 add_action('edit_user_profile', 'add_secsignid_login_fields'); // is called when admin edits a user profile...
-
 add_action('user_profile_update_errors', 'check_secsignid_login_fields'); // called before a user is updated.  when creating a new user this hook action is called too. http://adambrown.info/p/wp_hooks/hook/profile_update
-
 add_action('profile_update', 'save_secsignid_login_fields'); // is called whenever a profile is updated.
 
 add_filter('pre_update_option_secsignid_user_mapping', 'save_all_secsignid_user_mappings'); // is called before secsign id login options will be saved
 
 add_action('admin_notices', 'secsign_admin_notice');
+add_action('admin_enqueue_scripts', 'enqueue_secsign_admin_scripts');
+
+
+
+if (!(function_exists('enqueue_secsign_admin_scripts'))) {
+    /**
+     * Enqueue all js scripts
+     */
+    function enqueue_secsign_admin_scripts() {
+            wp_register_script('SecSignIDApi', plugins_url('/jsApi/SecSignIDApi.js', __FILE__), array('jquery'));
+            wp_enqueue_script('SecSignIDApi');
+    }
+}
 
 
 global $secsignid_login_text_domain;
@@ -38,7 +47,8 @@ array(
                 'name' => 'secsignid_service_name',
                 'default' => get_bloginfo('name'),
                 'label' => __('Service Name', $secsignid_login_text_domain),
-                'desc' => __('The name of this web site as it shall be displayed on the user\'s smart phone.', $secsignid_login_text_domain)
+                'desc' => __('The name of this web site as it shall be displayed on the user\'s smart phone.', $secsignid_login_text_domain),
+                'type' => ''
                 //'editable' => false
             ),
 
@@ -320,7 +330,7 @@ if (!(function_exists('secsignid_login_options_page'))) {
                                 return false;
                             }
                             
-                            if (!SecSignIdApi.checkSecSignId(value)) {
+                            if (!SecSignIDApi.checkSecSignId(value)) {
                                 alert("SecSign ID for wordpress user '" + span.innerHTML + "' contains illegal characters.");
                                 return false;
                             }
@@ -364,7 +374,7 @@ if (!function_exists('get_secsignid_mapping_table')) {
         global $current_user; // instance of type WP_User
         global $user_ID;
 
-        get_currentuserinfo();
+        wp_get_current_user();
 
         // check if a user is logged in
         if ($user_ID == 0 || $user_ID == '') {
@@ -396,7 +406,7 @@ if (!function_exists('get_secsignid_mapping_table')) {
 
             // input field with name of secsign id
             $user_table .= "<input class='regular-text' type='text' id='secsignid_for_wp_user_" . $wpu->ID . "' name='secsignid_for_wp_user_" . $wpu->ID . "' value='";
-            if ($mapping_array[$wpu->ID]) {
+            if (isset($mapping_array[$wpu->ID])) {
                 $user_table .= $mapping_array[$wpu->ID]['secsignid'];
             }
             $user_table .= "' /></td>" . PHP_EOL;
@@ -513,7 +523,7 @@ if (!function_exists('add_secsignid_login_fields')) {
 
         echo "<input type='text' class='regular-text' id='secsign_id' name='secsign_id' value='" . $secsignid . "' />" . PHP_EOL;
 
-        $allow_password_login = get_allow_password_login($user->id);
+        $allow_password_login = get_allow_password_login($user->ID);
 
         echo "<label for='allow_password_login'>";
         echo "<input type='checkbox' id='allow_password_login' name='allow_password_login' value='1'" . checked(1, $allow_password_login, false) . " />" . PHP_EOL;
@@ -545,8 +555,8 @@ if (!function_exists('check_secsignid_login_fields')) {
      */
     function check_secsignid_login_fields($wp_error)
     {
-        $wp_user_id_to_check = $_POST['user_id'];
-        $secsignid_to_check = $_POST['secsign_id'];
+        $wp_user_id_to_check = isset($_POST['user_id']) ? $_POST['user_id'] : "";
+        $secsignid_to_check = isset($_POST['secsign_id']) ? $_POST['secsign_id'] : "";
 
         if ($secsignid_to_check) {
             // check if secsign id contains illegal characters

@@ -72,6 +72,10 @@ Blue: #599fcb
     outline: none;
 }
 
+#secsignidplugin #login-secsignid {
+	text-align:center;
+}
+
 #secsignidplugin #login-pw, #secsignidplugin #login-user, #secsignidplugin #wp-username, #secsignidplugin #wp-password, #secsignidplugin #user_login, #secsignidplugin #user_pass {
     background: none;
 }

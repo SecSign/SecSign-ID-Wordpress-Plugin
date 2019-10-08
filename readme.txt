@@ -2,7 +2,7 @@
 Contributors: SecSign
 Tags: two-factor authentication, two-factor, authentication, 2 factor authentication, login, sign in, single sign-on, challenge response, rsa, password, mobile, iphone, android, security, authenticator, authenticate, two step authentication, 2fa, tfa
 Requires at least: 3.0.1
-Tested up to: 4.5
+Tested up to: 5.1.1
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -82,7 +82,7 @@ For more detailed information about two-factor-authentication (2FA) or two-step-
 
 = Note =
 
-The SecSign ID WordPress plugin uses the [SecSign ID API](https://github.com/SecSign/secsign-php-api). The API requests from the SecSign ID server a so-called access pass (a session and a pass icon) which must be confirmed on the smartphone. In order to enable the plugin to establish a connection to the SecSign ID server, the curl packet (http://php.net/manual/de/book.curl.php) must be installed for PHP, and the web server on which the WordPress site is running must be able to reach the SecSign ID server under https://httpapi.secsign.com. Otherwise, you have to make changes in the settings for firewall and/or proxy.
+The SecSign ID WordPress plugin uses the [SecSign ID API](https://github.com/SecSign/secsign-php-api). The API requests from the SecSign ID server a so-called access pass (a session and a pass icon) which must be confirmed on the smartphone. In order to enable the plugin to establish a connection to the SecSign ID server, the curl packet (http://php.net/manual/en/book.curl.php) must be installed for PHP, and the web server on which the WordPress site is running must be able to reach the SecSign ID server under https://httpapi.secsign.com. Otherwise, you have to make changes in the settings for firewall and/or proxy.
 
 = Add the Login Widget =
 
@@ -144,6 +144,16 @@ Do the following steps in order to disable the SecSign ID WordPress login:
 4. The SecSign ID WordPress Plugin is now deactivated. Click on "Plugins" in the main menu, look for "SecSign" and activate it.
 5. Adjust options in the SecSign ID settings.
 
+= I get the error: The authentication server sent no response or you are not connected to the internet.
+
+The plugin needs to make a connection to https://httpapi.secsign.com to work correctly. This error means it can't connect to our server. There are some possible reasons for this:
+
+1. Please check if you have a firewall or router that might block the connection to httpapi.secsign.com on port 443.
+2. Please check that the curl packet (http://php.net/manual/en/book.curl.php) is installed in your PHP installation. If this is not the case you should see a curl error about this in your webserver logs.
+3. Please check if you have another wordpress plugin which might block the connection to our server. There are several wordpress security plugins doing this.
+
+Please contact us at support@secsign.com if this doesn't help.
+
 == Screenshots ==
 
 1. This is the login form in which you enter your SecSign ID shown in the smartphone app.
@@ -158,6 +168,57 @@ Do the following steps in order to disable the SecSign ID WordPress login:
 10. The options for self enrollment whether a user can assign his or her SecSign ID by him- or herself and whether a user can create a new account.
 
 == Changelog ==
+
+= 1.7.16 =
+* Added new PHP API
+* Added new JS API
+* Added new FAQ entry for connection problems
+* Tested WP compatibility for Wordpress 5.1.1
+
+Note: Due to changes at the javascript files, please flush the page cache or any other cache you are using to have the updated files within the browser.
+
+= 1.7.15 =
+* Removed WP_DEBUG Notices
+* Added new PHP API
+* Added new JS API
+* Tested WP compatibility for Wordpress 4.9.8
+
+Note: Due to changes at the javascript files, please flush the page cache or any other cache you are using to have the updated files within the browser.
+
+= 1.7.14 =
+* Added workaround for port issue on misconfigured apache server
+* Added new PHP API
+* Added new JS API
+* Tested WP compatibility for Wordpress 4.9.6
+
+Note: Due to changes at the javascript files, please flush the page cache or any other cache you are using to have the updated files within the browser.
+
+= 1.7.13 =
+* Added links to SecSign plugin website on Wordpress.org in plugin listing
+* Added new PHP API
+* Tested WP compatibility for Wordpress 4.9.1
+
+= 1.7.12 =
+* New version of [SecSignIDApi.js](https://github.com/SecSign/secsign-js-api)
+* Tested WP compatibility for Wordpress 4.7
+
+Note: Due to changes at the javascript files, please flush the page cache or any other cache you are using to have the updated files within the browser.
+
+= 1.7.11 =
+* New version of [SecSignIDApi.js](https://github.com/SecSign/secsign-js-api)
+* Accepted authentication sessions are handled by server. No need to release them manually
+* Minor CSS changes
+* Tested WP compatibility for Wordpress 4.6
+
+Note: Due to changes at the javascript files, please flush the page cache or any other cache you are using to have the updated files within the browser.
+
+= 1.7.10 =
+* Show server errors to user rather than a nondescriptive default error message.
+* Check given SecSign ID if it is syntactically correct before sending it
+* New version of [SecSignIDApi.js](https://github.com/SecSign/secsign-js-api)
+* Tested WP compatibility for Wordpress 4.5.1
+
+Note: Due to changes at the javascript files, please flush the page cache or any other cache you are using to have the updated files within the browser.
 
 = 1.7.9 =
 * Fixed form switching bug

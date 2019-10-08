@@ -1,8 +1,8 @@
 <?php
 /*
 Plugin Name: SecSign
-Plugin URI: https://www.secsign.com/add-it-to-your-website/
-Version: 1.7.9
+Plugin URI: https://www.secsign.com/wordpress-tutorial/
+Version: 1.7.16
 Description: Two-factor authentication (2FA) with the SecSign ID. The SecSign plugin allows a user to login using his SecSign ID and his smartphone.
 Author: SecSign Technologies Inc.
 Author URI: http://www.secsign.com
@@ -50,7 +50,7 @@ add_filter('authenticate', 'secsign_id_check_login', 100, 3); //high priority, s
 add_action('login_footer', 'secsign_custom_login_form', 0); //custom login form
 add_action('wp_login_failed', 'secsign_front_end_pw_login_fail'); // hook failed login
 add_filter('login_enqueue_scripts', 'enqueue_secsign_scripts'); //enqueue all js scripts at admin dashboard
-
+add_filter('plugin_row_meta', 'secsign_meta_links', 10, 2); // adds links to meta field in plugin listing at wordpress dashboard
 
 if (!(function_exists('enqueue_secsign_scripts'))) {
     /**
@@ -91,6 +91,25 @@ if (!(function_exists('secsign_front_end_pw_login_fail'))) {
 }
 
 
+if (!(function_exists('secsign_meta_links'))) {
+	/**
+	 * Add a WordPress plugin page and rating links to the meta information to the plugin list.
+	 */
+	function secsign_meta_links($links, $file)
+	{
+		if( $file == plugin_basename(__FILE__)) 
+		{
+			$plugin_url = 'https://wordpress.org/plugins/secsign/';
+			$links[] = '<a href="'. $plugin_url .'" target="_blank" title="'. __('Click here to visit the SecSign on WordPress.org', 'secsign') .'">'. __('SecSign on WordPress.org', 'secsign') .'</a>';
+			
+			$rate_url = 'https://wordpress.org/support/plugin/secsign/reviews/?rate=5#new-post';
+			$links[] = '<a href="'. $rate_url .'" target="_blank" title="'. __('Click here to rate and review the SecSign plugin on WordPress.org', 'secsign') .'">'. __('Rate the SecSign plugin', 'secsign') .'</a>';
+		}
+		
+		return $links;
+	}
+}
+
 if (!(function_exists('secsign_print_parameters'))) {
     /**
      * Adds the SecSign ID JS parameters
@@ -100,13 +119,13 @@ if (!(function_exists('secsign_print_parameters'))) {
         $plugin_path = plugin_dir_url(__FILE__);
         $wp_site_url = get_site_url();
         echo '<script>
-            //Parameters
+            // Parameters
             var url = "' . $wp_site_url . '";
-            var siteurl = "' . $wp_site_url . '";
             var title = "' . addslashes(get_option('secsignid_service_name')) . '";
             var secsignPluginPath = "' .addslashes($plugin_path) . '";
             var apiurl = secsignPluginPath + "jsApi/signin-bridge.php";
             var errormsg = "Your login session has expired, was canceled, or was denied.";
+            var novalidsecsignid = "Given SecSign ID contains illegal characters."
             var noresponse = "The authentication server sent no response or you are not connected to the internet.";
             var nosecsignid = "Invalid SecSignID.";
             var secsignid = "";
@@ -115,6 +134,21 @@ if (!(function_exists('secsign_print_parameters'))) {
             if(!url) {
                 url = location.href;
             }
+            
+            // now check that secsignPluginPath and url starts with current location href
+            // otherwise the url differs from the wordpress site url. In this case the browser will block javascript posts
+            // due to same domain policy
+            var parser = document.createElement("a");
+            parser.href = url;
+            if(parser.hostname != location.hostname){
+            	//alert("The wordpress site url does not match current url in browser. A login cannot be done");
+            }
+            
+            parser.href = apiurl;
+            if(parser.hostname != location.hostname){
+            	//alert("The wordpress site url does not match current url in browser. A login cannot be done");
+            }
+            
             if(!title) {
                 title = document.title;
             }
@@ -195,7 +229,7 @@ if (!(function_exists('secsign_id_check_login'))) {
         if (!empty($username)) {
             $user_object = get_user_by('login', $username);
             if ($user_object) {
-                $allow_password_login = get_allow_password_login($user_object->id);
+                $allow_password_login = get_allow_password_login($user_object->ID);
                 if ($allow_password_login) {
                     return $user;
                 } else {
@@ -273,7 +307,7 @@ if (!(function_exists('secsign_id_init_auth_cookie_check'))) {
         {
             $user = wp_get_current_user();
             if ($user) {
-                $allow_password_login = get_allow_password_login($user->id);
+                $allow_password_login = get_allow_password_login($user->ID);
                 if (!$allow_password_login && !secsign_id_verify_cookie($user->user_login)) //if password-based login not allowed and cookie not verified -> logout
                 {
                     wp_logout();
@@ -413,10 +447,10 @@ if (!(function_exists('secsign_id_login'))) {
         global $current_user; // instance of type WP_User: http://codex.wordpress.org/Class_Reference/WP_User
         global $user_ID;
 
-        get_currentuserinfo(); // http://codex.wordpress.org/Function_Reference/get_currentuserinfo
+        wp_get_current_user(); // http://codex.wordpress.org/Function_Reference/get_currentuserinfo
 
         // print widget opening tage
-        echo $before_widget; //come out of $args
+        if(isset($before_widget)){echo $before_widget;} //come out of $args
 
         if ($user_ID == 0 || $user_ID == '') {
             // no user is logged in
@@ -611,7 +645,7 @@ INTERIM_LOGIN;
 
         secsignid_login_hide_wp_login();
         // print widget closing tag
-        echo $after_widget;
+        if(isset($after_widget)){echo $after_widget;}
     }
 }
 
@@ -824,14 +858,6 @@ if (!(function_exists('secsign_id_check_authsession'))) {
                 if ($secsignid_login_auth_session_status == AuthSession::AUTHENTICATED) {
                     //save to the session, that the secsign id was authenticated. This will later allow the assignment to/creation of a wordpress user
                     $_SESSION['authenticated'] = $_POST['secsigniduserid'];
-
-                    // release authentication session. it is not used any more
-                    try {
-                        $secSignIDApi->releaseAuthSession($authsession);
-                    } catch(Exception $e){
-                        //do nothing if the authentication session cannot be released, proceed with user login
-                    }
-
                     $user_to_login = get_wp_user($_POST['secsigniduserid']);
                     if ($user_to_login) {
                         if ($user_to_login->user_login) {// == $_POST['mapped_wp_user']) {
@@ -905,7 +931,9 @@ if (!(function_exists('secsign_id_login_post_url'))) {
             $post_url = "/";
         }
 
-        return $prot . "://" . $_SERVER['SERVER_NAME'] . ":" . $_SERVER['SERVER_PORT'] . $post_url;
+        //return $prot . "://" . $_SERVER['SERVER_NAME'] . ":" . $_SERVER['SERVER_PORT'] . $post_url;
+        
+        return $post_url;
     }
 }
 
